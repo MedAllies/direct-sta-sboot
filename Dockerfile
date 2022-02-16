@@ -11,7 +11,7 @@ RUN apk add --no-cache curl && \
 LABEL tag=sta
 
 # Build arguments
-ARG BUILD_VERSION=8.1.0-SNAPSHOT
+ARG BUILD_VERSION=8.1.2-SNAPSHOT
 
 # Create and use local user and group
 RUN addgroup -S direct && adduser -S -D direct -G direct
@@ -20,6 +20,9 @@ RUN addgroup -S direct && adduser -S -D direct -G direct
 RUN mkdir -p /opt/app
 RUN chown direct:direct /opt/app
 ENV PROJECT_HOME /opt/app
+
+ARG DEPLOY_PLATFORM=docker
+ENV DEPLOY_PLATFORM ${DEPLOY_PLATFORM}
 
 # Set microservice
 ENV CLOUD_CONFIG=true
@@ -49,8 +52,8 @@ ENV RABBIT_MQ_PASSWORD=guest
 USER direct:direct
 
 # Copy application artifact
-COPY bootstrap.properties $PROJECT_HOME/bootstrap.properties
-COPY application.properties $PROJECT_HOME/application.properties
+COPY src/main/resources/bootstrap-$DEPLOY_PLATFORM.properties $PROJECT_HOME/bootstrap.properties
+COPY src/main/resources/application-$DEPLOY_PLATFORM.properties $PROJECT_HOME/application.properties
 COPY target/direct-sta-sboot-$BUILD_VERSION.jar $PROJECT_HOME/sta.jar
 
 # Switching to the application location
